@@ -1,0 +1,5 @@
+[python]
+path = "/home/thomas/github/libi2c-python/.venv/bin/python"
+
+[strategy]
+save = "compatible"
