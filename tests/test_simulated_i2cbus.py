@@ -5,7 +5,7 @@ perform I²C bus related tests
 
 import unittest
 
-import feeph.i2c.bus as sut  # sytem under test
+import feeph.i2c as sut  # sytem under test
 
 
 class TestSimulatedI2cBus(unittest.TestCase):
