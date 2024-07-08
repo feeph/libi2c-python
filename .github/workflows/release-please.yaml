@@ -12,7 +12,7 @@ on:
       - master
 
 # verify "Actions" settings:
-# https://github.com/feeph/libi2c-emc2101-python/settings/actions
+# https://github.com/feeph/libi2c-python/settings/actions
 #  - [x] "Allow GitHub Actions to create and approve pull requests"
 permissions:
   contents: write
