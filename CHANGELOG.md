@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/feeph/libi2c-python/compare/v0.2.1...v0.3.0) (2024-07-14)
+
+
+### Features
+
+* redesign the library and document its philosophy ([67f1671](https://github.com/feeph/libi2c-python/commit/67f1671e57f4ce06c160c39705e63b14dfb3c196))
+
 ## [0.2.1](https://github.com/feeph/libi2c-python/compare/v0.2.0...v0.2.1) (2024-07-08)
 
 
