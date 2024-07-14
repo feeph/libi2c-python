@@ -62,7 +62,7 @@ build-backend = "pdm.backend"
 profile           = "black"
 line_length       = 250
 multi_line_output = 7
-src_paths         = ["src", "tests"]
+src_paths         = ["feeph", "tests"]
 
 # https://pypi.org/project/autopep8/
 [tool.autopep8]
@@ -79,7 +79,7 @@ filename = "requirements.txt"
 groups = ["default", "test"]
 
 [tool.pdm.build]
-includes = ["src/"]
+includes = ["feeph/"]
 source-includes = ["tests/"]
 
 [tool.pdm.dev-dependencies]

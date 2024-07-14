@@ -5,7 +5,7 @@
 groups = ["default", "dev", "test", "tests", "tox"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.2"
-content_hash = "sha256:da3182fa1aa2be3cab28f12e60a0dd3a953be37752d0f53db9b9d5d00614800e"
+content_hash = "sha256:472a30ac5180286a2d1ab9faf05a874e28b25e3d00448485cee9896bbd8a1366"
 
 [[package]]
 name = "adafruit-blinka"
