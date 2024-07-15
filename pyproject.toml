@@ -22,8 +22,7 @@ authors = [
     {name = "Feeph Aifeimei", email = "55798703+feeph@users.noreply.github.com"},
 ]
 dependencies = [
-    "adafruit-board-toolkit~=1.1",
-    "adafruit-circuitpython-busdevice~=5.2",
+    "adafruit-blinka~=8.46",
     "gpiod~=2.2",
     "RPI-GPIO~=0.7",
 ]

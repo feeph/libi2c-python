@@ -5,11 +5,11 @@
 groups = ["default", "dev", "test", "tests", "tox"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.2"
-content_hash = "sha256:472a30ac5180286a2d1ab9faf05a874e28b25e3d00448485cee9896bbd8a1366"
+content_hash = "sha256:d11f034e223faf609c49622a56498a60b7bbbd5a05528149d2ad2aa2220682da"
 
 [[package]]
 name = "adafruit-blinka"
-version = "8.45.2"
+version = "8.46.0"
 requires_python = ">=3.7.0"
 summary = "CircuitPython APIs for non-CircuitPython versions of Python such as CPython on Linux and MicroPython."
 groups = ["default"]
@@ -23,22 +23,8 @@ dependencies = [
     "sysv-ipc>=1.1.0; sys_platform == \"linux\" and platform_machine != \"mips\"",
 ]
 files = [
-    {file = "Adafruit_Blinka-8.45.2-py3-none-any.whl", hash = "sha256:af72f085e72f3a14a37d5d836d29c60c74c1c6da9dfd1572a5b4a30e5e480deb"},
-    {file = "adafruit_blinka-8.45.2.tar.gz", hash = "sha256:d61d2ad58e897f1033d8e629dc12f3f9efb040810c48d8aa08fffd8e91fb3452"},
-]
-
-[[package]]
-name = "adafruit-board-toolkit"
-version = "1.1.1"
-requires_python = ">=3.5.0"
-summary = "CircuitPython board identification and information"
-groups = ["default"]
-dependencies = [
-    "pyserial~=3.5",
-]
-files = [
-    {file = "adafruit-board-toolkit-1.1.1.tar.gz", hash = "sha256:93c4f09b3b469c2a92e85e59ad74819de7d9cdcda4bee52a6311807a344076c2"},
-    {file = "adafruit_board_toolkit-1.1.1-py3-none-any.whl", hash = "sha256:4d5d7a47e33f0636f9bd1c7238b064031015f20c1aab1906c0410c793988137d"},
+    {file = "Adafruit_Blinka-8.46.0-py3-none-any.whl", hash = "sha256:cfd750a6d2df137fa3c35c0f53c23e7af8cbe8f614d387f908c180cfba954b8e"},
+    {file = "adafruit_blinka-8.46.0.tar.gz", hash = "sha256:f2d4d10aa17e13e5e6bd2212b62c00d0e76c767a0f80f3c858d77bd6ab1d4251"},
 ]
 
 [[package]]
@@ -70,7 +56,7 @@ files = [
 
 [[package]]
 name = "adafruit-circuitpython-requests"
-version = "4.1.3"
+version = "4.1.4"
 summary = "A requests-like library for web interfacing"
 groups = ["default"]
 dependencies = [
@@ -78,8 +64,8 @@ dependencies = [
     "Adafruit-Circuitpython-ConnectionManager",
 ]
 files = [
-    {file = "adafruit_circuitpython_requests-4.1.3-py3-none-any.whl", hash = "sha256:1af5451bd6e3357dfd8aaeaee3e49026072c1d7261f810c29c43fc981e02f29c"},
-    {file = "adafruit_circuitpython_requests-4.1.3.tar.gz", hash = "sha256:336fd054141e9b10b3820b8d176e10a0ec570b4c8709693c2b4c99796e227242"},
+    {file = "adafruit_circuitpython_requests-4.1.4-py3-none-any.whl", hash = "sha256:519d18f5ddbc5f7ba02a7079fcdf7947430fb422fd9c2c42c1c4480cb48e47be"},
+    {file = "adafruit_circuitpython_requests-4.1.4.tar.gz", hash = "sha256:516ba2795f8295c82c8928681b047385c3f6998a6bcfd2c2d765e8a70a562ed5"},
 ]
 
 [[package]]
@@ -101,12 +87,12 @@ files = [
 
 [[package]]
 name = "adafruit-platformdetect"
-version = "3.71.0"
+version = "3.72.0"
 summary = "Platform detection for use by libraries like Adafruit-Blinka."
 groups = ["default"]
 files = [
-    {file = "Adafruit_PlatformDetect-3.71.0-py3-none-any.whl", hash = "sha256:277f42b4de668b2339c1f1a40b5a716b8e4b79141149835c0e36096b18f5abb3"},
-    {file = "adafruit_platformdetect-3.71.0.tar.gz", hash = "sha256:b205d4d66dd2b843f61c880838a3364b3f27a0b192aeecc57becdfd1d03da760"},
+    {file = "Adafruit_PlatformDetect-3.72.0-py3-none-any.whl", hash = "sha256:f6306ee4679c9b01450d8a1cd3e02955ace1f7e666bba0371832b2049490f845"},
+    {file = "adafruit_platformdetect-3.72.0.tar.gz", hash = "sha256:1e320061b13b11413418e9ce11f0badd02563b5d5c02330445b39105b8da7463"},
 ]
 
 [[package]]
