@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.2](https://github.com/feeph/libi2c-python/compare/v0.3.1...v0.3.2) (2024-07-15)
+
+
+### Documentation
+
+* Update design.md ([#12](https://github.com/feeph/libi2c-python/issues/12)) ([f51a191](https://github.com/feeph/libi2c-python/commit/f51a19154346ff742de315bad1b984e70b9f5408))
+
 ## [0.3.1](https://github.com/feeph/libi2c-python/compare/v0.3.0...v0.3.1) (2024-07-15)
 
 
