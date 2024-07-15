@@ -17,7 +17,7 @@ can be used directly but exposes implementation details
 
 - `I2C.readfrom_into()`, `I2C.writeto()`, `I2C.writeto_then_readfrom()` are
   named weirdly and have confusing signatures.
-   - It is unclear what purpose the method `I2C.writeto()` has.
+   - It is unclear what purpose the method `I2C.readfrom_into()` has.
    - It is unclear whether 'in_buffer' and 'out_buffer' relate to
      direction "device-to-caller" or "caller-to-device" without looking
      at the implementation.
