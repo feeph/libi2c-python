@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/feeph/libi2c-python/compare/v0.3.0...v0.3.1) (2024-07-15)
+
+
+### Bug Fixes
+
+* update package dependencies ([#10](https://github.com/feeph/libi2c-python/issues/10)) ([688e814](https://github.com/feeph/libi2c-python/commit/688e81421a03503c13852914fd9033f4696bf552))
+
 ## [0.3.0](https://github.com/feeph/libi2c-python/compare/v0.2.1...v0.3.0) (2024-07-14)
 
 
