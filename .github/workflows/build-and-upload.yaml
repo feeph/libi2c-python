@@ -1,9 +1,9 @@
 ---
-name: my-name
+name: publish on TestPyPI
 
 on:
   release:
-  workflow-dispatch:
+  workflow_dispatch:
 
 jobs:
   build-and-upload:
