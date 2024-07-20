@@ -67,6 +67,7 @@ def read_device_registers(i2c_bus: busio.I2C, reads: list[tuple[int, int, int]],
         if i2c_adr < 0 or i2c_adr > 255:
             raise ValueError(f"Provided I²C address {i2c_adr} is out of range! (allowed range: 0 <= x <= 255)")
     for cur_try in range(1, 1 + max_tries):
+        is_success = False
         # make sure we have exclusive access to the I²C bus
         feeph.i2c.utility.try_lock_with_timeout(i2c_bus=i2c_bus, timeout_ms=timeout_ms)
         # read from the registers and unlock the bus again
@@ -83,6 +84,7 @@ def read_device_registers(i2c_bus: busio.I2C, reads: list[tuple[int, int, int]],
                 i2c_bus.writeto_then_readfrom(address=i2c_adr, buffer_out=buf_r, buffer_in=buf_w)
                 # TODO properly handle multi byte reads
                 values.append(buf_w[0])
+            is_success = True
         except OSError as e:
             # [Errno 121] Remote I/O error
             LH.warning("[%s] Failed to read register 0x%02X (%i/%i): %s",  __name__, register, cur_try, max_tries, e)
@@ -92,7 +94,11 @@ def read_device_registers(i2c_bus: busio.I2C, reads: list[tuple[int, int, int]],
             time.sleep(0.1)
         finally:
             i2c_bus.unlock()
-        return values
+        # are we done yet?
+        if is_success:
+            return values
+        else:
+            LH.debug("Failed to process all reads. Retrying.")
     else:
         raise RuntimeError(f"Unable to read register 0x{register:02X} after {cur_try} attempts. Giving up.")
 
@@ -144,6 +150,7 @@ def write_device_registers(i2c_bus: busio.I2C, writes: list[tuple[int, int, int,
         if i2c_adr < 0 or i2c_adr > 255:
             raise ValueError(f"Provided I²C address {i2c_adr} is out of range! (allowed range: 0 <= x <= 255)")
     for cur_try in range(1, 1 + max_tries):
+        is_success = False
         # make sure we have exclusive access to the I²C bus
         feeph.i2c.utility.try_lock_with_timeout(i2c_bus=i2c_bus, timeout_ms=timeout_ms)
         # write to the registers and unlock the bus again
@@ -158,7 +165,7 @@ def write_device_registers(i2c_bus: busio.I2C, writes: list[tuple[int, int, int,
                 buf[1] = value & 0xFF
                 # TODO properly handle multi byte reads
                 i2c_bus.writeto(address=i2c_adr, buffer=buf)
-            return
+            is_success = True
         except OSError as e:
             # [Errno 121] Remote I/O error
             LH.warning("[%s] Failed to read register 0x%02X (%i/%i): %s",  __name__, register, cur_try, max_tries, e)
@@ -168,5 +175,10 @@ def write_device_registers(i2c_bus: busio.I2C, writes: list[tuple[int, int, int,
             time.sleep(0.1)
         finally:
             i2c_bus.unlock()
+        # are we done yet?
+        if is_success:
+            return
+        else:
+            LH.debug("Failed to process all writes. Retrying.")
     else:
         raise RuntimeError(f"Unable to read register 0x{register:02X} after {cur_try} attempts. Giving up.")
