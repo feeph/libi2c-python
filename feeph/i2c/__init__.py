@@ -14,6 +14,7 @@ import feeph.i2c.utility
 
 # the following imports are provided for user convenience
 # flake8: noqa: F401
+from feeph.i2c.burst_handler import BurstHandler, BurstHandle
 from feeph.i2c.emulation import EmulatedI2C
 
 LH = logging.getLogger("i2c")
@@ -28,7 +29,7 @@ def read_device_register(i2c_bus: busio.I2C, i2c_adr: int, register: int, byte_c
       - may raise a RuntimeError if there were too many errors
 
     If you need to read multiple registers in a single transaction please
-    use `read_device_registers()` instead. This will ensure all values are
+    use `feeph.i2c.Burst()` instead. This will ensure all values are
     read while holding the same lock and prevent outside interference.
 
     typical usage:
@@ -36,10 +37,8 @@ def read_device_register(i2c_bus: busio.I2C, i2c_adr: int, register: int, byte_c
     value1 = read_device_register(i2c_bus, 0x4C, 0x00)
     ```
     """
-    reads = [
-        (i2c_adr, register, byte_count)
-    ]
-    return read_device_registers(i2c_bus, reads, max_tries, timeout_ms).pop()
+    with BurstHandler(i2c_bus=i2c_bus, i2c_adr=i2c_adr, timeout_ms=timeout_ms) as bh:
+        return bh.read_register(register=register, byte_count=byte_count, max_tries=max_tries)
 
 
 def read_device_registers(i2c_bus: busio.I2C, reads: list[tuple[int, int, int]], max_tries: int = 3, timeout_ms: int = 500) -> list[int]:
@@ -111,7 +110,7 @@ def write_device_register(i2c_bus: busio.I2C, i2c_adr: int, register: int, value
       - may raise a RuntimeError if there were too many errors
 
     If you need to write multiple registers in a single transaction please
-    use `write_device_registers()` instead. This will ensure all values are
+    use `feeph.i2c.Burst()` instead. This will ensure all values are
     written while holding the same lock and prevent outside interference.
 
     typical usage:
@@ -119,10 +118,8 @@ def write_device_register(i2c_bus: busio.I2C, i2c_adr: int, register: int, value
     write_device_register(i2c_bus, 0x4C, 0x00, value)
     ```
     """
-    writes = [
-        (i2c_adr, register, byte_count, value)
-    ]
-    write_device_registers(i2c_bus, writes, max_tries, timeout_ms)
+    with BurstHandler(i2c_bus=i2c_bus, i2c_adr=i2c_adr, timeout_ms=timeout_ms) as bh:
+        bh.write_register(register=register, value=value, byte_count=byte_count, max_tries=max_tries)
 
 
 def write_device_registers(i2c_bus: busio.I2C, writes: list[tuple[int, int, int, int]], max_tries: int = 3, timeout_ms: int = 500):
