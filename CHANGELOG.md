@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/feeph/libi2c-python/compare/v0.4.1...v0.5.0) (2024-07-20)
+
+
+### Features
+
+* provide a context manager for read/write operations ([#20](https://github.com/feeph/libi2c-python/issues/20)) ([a728a8b](https://github.com/feeph/libi2c-python/commit/a728a8b55ff67f85c390e238a0cf884c3bfa8ac0))
+
 ## [0.4.1](https://github.com/feeph/libi2c-python/compare/v0.4.0...v0.4.1) (2024-07-20)
 
 
