@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/feeph/libi2c-python/compare/v0.3.2...v0.4.0) (2024-07-20)
+
+
+### Features
+
+* provide type hints marker ([#14](https://github.com/feeph/libi2c-python/issues/14)) ([91b93bc](https://github.com/feeph/libi2c-python/commit/91b93bcb5bb3cbddcd90d02b10e057d5c73058e2))
+
 ## [0.3.2](https://github.com/feeph/libi2c-python/compare/v0.3.1...v0.3.2) (2024-07-15)
 
 
