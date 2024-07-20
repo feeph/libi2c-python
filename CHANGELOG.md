@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/feeph/libi2c-python/compare/v0.4.0...v0.4.1) (2024-07-20)
+
+
+### Bug Fixes
+
+* fix the retry-on-error logic ([#17](https://github.com/feeph/libi2c-python/issues/17)) ([254f9b3](https://github.com/feeph/libi2c-python/commit/254f9b39bb9d44fb99cea3d6fbebb6b16f4b8266))
+
 ## [0.4.0](https://github.com/feeph/libi2c-python/compare/v0.3.2...v0.4.0) (2024-07-20)
 
 
