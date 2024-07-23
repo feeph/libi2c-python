@@ -136,7 +136,7 @@ class TestBurstHandler(unittest.TestCase):
 
     def test_get_state(self):
         state = {
-            0x70: 0x01,
+            0x70: {-1: 0x01},
         }
         i2c_bus = sut.EmulatedI2C(state=state)
         # -----------------------------------------------------------------
@@ -148,14 +148,14 @@ class TestBurstHandler(unittest.TestCase):
 
     def test_set_state(self):
         state = {
-            0x70: 0x00,
+            0x70: {-1: 0x00},
         }
         i2c_bus = sut.EmulatedI2C(state=state)
         # -----------------------------------------------------------------
         with sut.BurstHandler(i2c_bus=i2c_bus, i2c_adr=0x70) as bh:
             bh.set_state(value=0x01)
         computed = i2c_bus._state[0x70]
-        expected = 0x01
+        expected = {-1: 0x01}
         # -----------------------------------------------------------------
         self.assertEqual(computed, expected)
 
