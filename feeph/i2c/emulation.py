@@ -43,16 +43,42 @@ class EmulatedI2C(busio.I2C):
     def unlock(self):
         pass
 
-    def readinto(self, buffer, *, start: int = 0, end: int | None = None):
-        # provided to ensure we will never call `I2C.readinto()`
-        raise RuntimeError("EmulatedI2cBus.readinto() is not implemented")
+    # We're going to use '-1' as a magic marker that the device state is
+    # being read/written since the register address must be positive in the
+    # range 0 ≤ x ≤ 255.
 
-    def writeto(self, address, buffer, *, start=0, end=None):
+    def readfrom_into(self, address, buffer, *, start=0, end=None, stop=True):
+        """
+        read device state
+        """
         i2c_device_address  = address
-        i2c_device_register = buffer[0]
-        self._state[i2c_device_address][i2c_device_register] = buffer[1]
+        i2c_device_register = -1
+        buffer[0] = self._state[i2c_device_address][i2c_device_register]
+
+    def writeto(self, address: int, buffer: bytearray, *, start=0, end=None):
+        """
+        write device state or register
+        """
+        if len(buffer) == 1:
+            # device status
+            i2c_device_address  = address
+            i2c_device_register = -1
+            value = buffer[0]
+        else:
+            # device register
+            i2c_device_address  = address
+            i2c_device_register = buffer[0]
+            if i2c_device_register < 0:
+                raise ValueError("device register can't be negative")
+            value = buffer[1]
+        self._state[i2c_device_address][i2c_device_register] = value
 
     def writeto_then_readfrom(self, address: int, buffer_out: bytearray, buffer_in: bytearray, *, out_start=0, out_end=None, in_start=0, in_end=None, stop=False):
+        """
+        read device register
+        """
         i2c_device_address  = address
         i2c_device_register = buffer_out[0]
+        if i2c_device_register < 0:
+            raise ValueError("device register can't be negative")
         buffer_in[0] = self._state[i2c_device_address][i2c_device_register]
