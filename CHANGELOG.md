@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.6.0](https://github.com/feeph/libi2c-python/compare/v0.5.0...v0.6.0) (2024-07-23)
+
+
+### Features
+
+* add configuration for dependabot ([31f07f2](https://github.com/feeph/libi2c-python/commit/31f07f237817fdc11fb5b999edfdfdc5bb8ab14c))
+* allow reading and writing of device state ([67a72cf](https://github.com/feeph/libi2c-python/commit/67a72cf2d96687d6fe94eda694bcdddf30d33163))
+
+
+### Bug Fixes
+
+* delete obsolete code in 'BurstHandler' ([0741bd4](https://github.com/feeph/libi2c-python/commit/0741bd423cd7fe121c5367afcb0375bd4aad4bfc))
+* remove obsolete file ([559d320](https://github.com/feeph/libi2c-python/commit/559d3201ef6a8219546d4ffcc0ffffb90d0f81cc))
+* update package versions ([5df0bb9](https://github.com/feeph/libi2c-python/commit/5df0bb91e51970433583dae5f20091407275ccba))
+
 ## [0.5.0](https://github.com/feeph/libi2c-python/compare/v0.4.1...v0.5.0) (2024-07-20)
 
 
