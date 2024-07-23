@@ -226,65 +226,6 @@ class BurstHandler:
         LH.debug("[%d] Releasing the lock on the I²C bus.", id(self))
         self._i2c_bus.unlock()
 
-    def read_register(self, register: int, byte_count: int = 1, max_tries: int = 5) -> int:
-        """
-        read a single register from I²C device identified by `i2c_adr` and
-        return its contents as an integer value
-        - may raise a RuntimeError if it was not possible to acquire
-            the bus within allowed time
-        - may raise a RuntimeError if there were too many errors
-        """
-        _validate_inputs(register=register, value=0, byte_count=byte_count, max_tries=max_tries)
-        if byte_count > 1:
-            LH.warning("Multi byte reads are not implemented yet! Returning a single byte instead.")
-            byte_count = 1
-        for cur_try in range(1, 1 + max_tries):
-            try:
-                buf_r = bytearray(1)
-                buf_r[0] = register
-                buf_w = bytearray(byte_count)
-                self._i2c_bus.writeto_then_readfrom(address=self._i2c_adr, buffer_out=buf_r, buffer_in=buf_w)
-                # TODO properly handle multi byte reads
-                return buf_w[0]
-            except OSError as e:
-                # [Errno 121] Remote I/O error
-                LH.warning("[%s] Failed to read register 0x%02X (%i/%i): %s",  __name__, register, cur_try, max_tries, e)
-                time.sleep(0.001)
-            except RuntimeError as e:
-                LH.warning("[%s] Unable to read register 0x%02X (%i/%i): %s", __name__, register, cur_try, max_tries, e)
-                time.sleep(0.001)
-        else:
-            raise RuntimeError(f"Unable to read register 0x{register:02X} after {cur_try} attempts. Giving up.")
-
-    def write_register(self, register: int, value: int, byte_count: int = 1, max_tries: int = 3):
-        """
-        write a single register to I²C device identified by `i2c_adr`
-        - may raise a RuntimeError if it was not possible to acquire
-            the bus within allowed time
-        - may raise a RuntimeError if there were too many errors
-        """
-        _validate_inputs(register=register, value=value, byte_count=byte_count, max_tries=max_tries)
-        if byte_count > 1:
-            LH.warning("Multi byte writes are not implemented yet! Returning a single byte instead.")
-            byte_count = 1
-        for cur_try in range(1, 1 + max_tries):
-            try:
-                buf = bytearray(1 + byte_count)
-                buf[0] = register
-                buf[1] = value & 0xFF
-                # TODO properly handle multi byte reads
-                self._i2c_bus.writeto(address=self._i2c_adr, buffer=buf)
-                return
-            except OSError as e:
-                # [Errno 121] Remote I/O error
-                LH.warning("[%s] Failed to read register 0x%02X (%i/%i): %s",  __name__, register, cur_try, max_tries, e)
-                time.sleep(0.1)
-            except RuntimeError as e:
-                LH.warning("[%s] Unable to read register 0x%02X (%i/%i): %s", __name__, register, cur_try, max_tries, e)
-                time.sleep(0.1)
-        else:
-            raise RuntimeError(f"Unable to read register 0x{register:02X} after {cur_try} attempts. Giving up.")
-
 
 def _validate_inputs(register: int, value: int, byte_count: int = 1, max_tries: int = 3):
     if register < 0 or register > 255:
