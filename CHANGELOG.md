@@ -7,12 +7,10 @@
 
 * add configuration for dependabot ([31f07f2](https://github.com/feeph/libi2c-python/commit/31f07f237817fdc11fb5b999edfdfdc5bb8ab14c))
 * allow reading and writing of device state ([67a72cf](https://github.com/feeph/libi2c-python/commit/67a72cf2d96687d6fe94eda694bcdddf30d33163))
-* allow reading and writing of device state ([#22](https://github.com/feeph/libi2c-python/issues/22)) ([85bad14](https://github.com/feeph/libi2c-python/commit/85bad14bf176aea084996916969cc0a63fdc173b))
 
 
 ### Bug Fixes
 
-* change comment indicator in pdm.toml ([6cd5c57](https://github.com/feeph/libi2c-python/commit/6cd5c57f26b66771172cf09dffd04882a2c4e8ad))
 * delete obsolete code in 'BurstHandler' ([0741bd4](https://github.com/feeph/libi2c-python/commit/0741bd423cd7fe121c5367afcb0375bd4aad4bfc))
 * remove obsolete file ([559d320](https://github.com/feeph/libi2c-python/commit/559d3201ef6a8219546d4ffcc0ffffb90d0f81cc))
 * update package versions ([5df0bb9](https://github.com/feeph/libi2c-python/commit/5df0bb91e51970433583dae5f20091407275ccba))
