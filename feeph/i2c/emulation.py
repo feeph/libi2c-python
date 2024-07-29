@@ -53,7 +53,10 @@ class EmulatedI2C(busio.I2C):
         """
         i2c_device_address  = address
         i2c_device_register = -1
-        buffer[0] = self._state[i2c_device_address][i2c_device_register]
+        value = self._state[i2c_device_address][i2c_device_register]
+        for i in range(len(buffer)):
+            buffer[i] = value & 0xff
+            value = value >> 8
 
     def writeto(self, address: int, buffer: bytearray, *, start=0, end=None):
         """
@@ -70,7 +73,15 @@ class EmulatedI2C(busio.I2C):
             i2c_device_register = buffer[0]
             if i2c_device_register < 0:
                 raise ValueError("device register can't be negative")
-            value = buffer[1]
+            value = 0
+            # i must count up (0->len-1) to calculate the correct bitshift
+            # offset must count down (len->1) when populating the buffer
+            #  0x..## -> buf[2]  -> i = 0, offset = 2
+            #  0x##.. -> buf[1]  -> i = 1, offset = 1
+            # (buf[0] contains the register address)
+            for i in range(len(buffer) - 1):
+                offset = len(buffer) - 1 - i
+                value += buffer[offset] << i*8
         self._state[i2c_device_address][i2c_device_register] = value
 
     def writeto_then_readfrom(self, address: int, buffer_out: bytearray, buffer_in: bytearray, *, out_start=0, out_end=None, in_start=0, in_end=None, stop=False):
@@ -81,4 +92,7 @@ class EmulatedI2C(busio.I2C):
         i2c_device_register = buffer_out[0]
         if i2c_device_register < 0:
             raise ValueError("device register can't be negative")
-        buffer_in[0] = self._state[i2c_device_address][i2c_device_register]
+        value = self._state[i2c_device_address][i2c_device_register]
+        for i in range(len(buffer_in)):
+            buffer_in[i] = value & 0xff
+            value = value >> 8
