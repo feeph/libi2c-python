@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0](https://github.com/feeph/libi2c-python/compare/v0.6.0...v0.7.0) (2024-07-29)
+
+
+### Features
+
+* support multi-byte reads for device registers ([#31](https://github.com/feeph/libi2c-python/issues/31)) ([6bc1ff5](https://github.com/feeph/libi2c-python/commit/6bc1ff55a7661995e386f4bde78ec57dc9ff1552))
+
 ## [0.6.0](https://github.com/feeph/libi2c-python/compare/v0.5.0...v0.6.0) (2024-07-23)
 
 
