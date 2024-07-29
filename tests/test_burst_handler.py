@@ -24,6 +24,20 @@ class TestBurstHandler(unittest.TestCase):
         # -----------------------------------------------------------------
         self.assertEqual(computed, expected)
 
+    def test_read_device_register_multibyte(self):
+        state = {
+            0x4C: {
+                0x00: 0x1234,
+            },
+        }
+        i2c_bus = sut.EmulatedI2C(state=state)
+        # -----------------------------------------------------------------
+        with sut.BurstHandler(i2c_bus=i2c_bus, i2c_adr=0x4C) as bh:
+            computed = bh.read_register(0x00, byte_count=2)
+        expected = 0x1234
+        # -----------------------------------------------------------------
+        self.assertEqual(computed, expected)
+
     def test_read_device_registers(self):
         state = {
             0x4C: {
@@ -72,6 +86,21 @@ class TestBurstHandler(unittest.TestCase):
             bh.write_register(register=0x00, value=0x12)
         computed = i2c_bus._state[0x4C]
         expected = {0x00: 0x12}
+        # -----------------------------------------------------------------
+        self.assertEqual(computed, expected)
+
+    def test_write_device_register_multibyte(self):
+        state = {
+            0x4C: {
+                0x00: 0x0000,
+            },
+        }
+        i2c_bus = sut.EmulatedI2C(state=state)
+        # -----------------------------------------------------------------
+        with sut.BurstHandler(i2c_bus=i2c_bus, i2c_adr=0x4C) as bh:
+            bh.write_register(register=0x00, value=0x1234, byte_count=2)
+        computed = i2c_bus._state[0x4C]
+        expected = {0x00: 0x1234}
         # -----------------------------------------------------------------
         self.assertEqual(computed, expected)
 
@@ -146,6 +175,18 @@ class TestBurstHandler(unittest.TestCase):
         # -----------------------------------------------------------------
         self.assertEqual(computed, expected)
 
+    def test_get_state_multibyte(self):
+        state = {
+            0x70: {-1: 0x01},
+        }
+        i2c_bus = sut.EmulatedI2C(state=state)
+        # -----------------------------------------------------------------
+        with sut.BurstHandler(i2c_bus=i2c_bus, i2c_adr=0x70) as bh:
+            computed = bh.get_state(byte_count=2)
+        expected = 0x01  # byte count was ignored
+        # -----------------------------------------------------------------
+        self.assertEqual(computed, expected)
+
     def test_set_state(self):
         state = {
             0x70: {-1: 0x00},
@@ -158,6 +199,13 @@ class TestBurstHandler(unittest.TestCase):
         expected = {-1: 0x01}
         # -----------------------------------------------------------------
         self.assertEqual(computed, expected)
+
+    def test_set_state_multibyte(self):
+        i2c_bus = sut.EmulatedI2C(state={0x70: {-1: 0x00}})
+        # -----------------------------------------------------------------
+        # -----------------------------------------------------------------
+        with sut.BurstHandler(i2c_bus=i2c_bus, i2c_adr=0x70) as bh:
+            self.assertRaises(ValueError, bh.set_state, value=0x0102)
 
     # ---------------------------------------------------------------------
 

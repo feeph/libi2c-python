@@ -62,17 +62,16 @@ class BurstHandle:
         - may raise a RuntimeError if there were too many errors
         """
         _validate_inputs(register=register, value=0, byte_count=byte_count, max_tries=max_tries)
-        if byte_count > 1:
-            LH.warning("Multi byte reads are not implemented yet! Returning a single byte instead.")
-            byte_count = 1
         for cur_try in range(1, 1 + max_tries):
             try:
-                buf_r = bytearray(1)
+                buf_r = bytearray(byte_count)
                 buf_r[0] = register
                 buf_w = bytearray(byte_count)
                 self._i2c_bus.writeto_then_readfrom(address=self._i2c_adr, buffer_out=buf_r, buffer_in=buf_w)
-                # TODO properly handle multi byte reads
-                return buf_w[0]
+                value = 0
+                for i in range(byte_count):
+                    value += buf_w[i] << i*8
+                return value
             except OSError as e:
                 # [Errno 121] Remote I/O error
                 LH.warning("[%s] Failed to read register 0x%02X (%i/%i): %s",  __name__, register, cur_try, max_tries, e)
@@ -91,15 +90,16 @@ class BurstHandle:
         - may raise a RuntimeError if there were too many errors
         """
         _validate_inputs(register=register, value=value, byte_count=byte_count, max_tries=max_tries)
-        if byte_count > 1:
-            LH.warning("Multi byte writes are not implemented yet! Returning a single byte instead.")
-            byte_count = 1
         for cur_try in range(1, 1 + max_tries):
             try:
-                buf = bytearray(1 + byte_count)
+                buf = bytearray(1 + byte_count)  # buf[0], buf[1], buf[2]
                 buf[0] = register
-                buf[1] = value & 0xFF
-                # TODO properly handle multi byte reads
+                # need to populate the bytes in reverse order:
+                #   0x##.. => buf[2]
+                #   0x..## => buf[1]
+                for i in range(byte_count, 0, -1):
+                    buf[i] = value & 0xFF
+                    value = value >> 8
                 self._i2c_bus.writeto(address=self._i2c_adr, buffer=buf)
                 return
             except OSError as e:
@@ -111,6 +111,9 @@ class BurstHandle:
                 time.sleep(0.1)
         else:
             raise RuntimeError(f"Unable to read register 0x{register:02X} after {cur_try} attempts. Giving up.")
+
+    # it is unclear if it's possible to have a multi-byte state registers
+    # (a register write looks exactly like a multi-byte state write)
 
     def get_state(self, byte_count: int = 1, max_tries: int = 5) -> int:
         """
@@ -127,7 +130,6 @@ class BurstHandle:
         for cur_try in range(1, 1 + max_tries):
             try:
                 buf = bytearray(byte_count)
-                # TODO properly handle multi byte reads
                 self._i2c_bus.readfrom_into(address=self._i2c_adr, buffer=buf)
                 return buf[0]
             except OSError as e:
@@ -155,7 +157,6 @@ class BurstHandle:
             try:
                 buf = bytearray(byte_count)
                 buf[0] = value & 0xFF
-                # TODO properly handle multi byte reads
                 self._i2c_bus.writeto(address=self._i2c_adr, buffer=buf)
                 return
             except OSError as e:
@@ -228,7 +229,7 @@ class BurstHandler:
 
 
 def _validate_inputs(register: int, value: int, byte_count: int = 1, max_tries: int = 3):
-    if register < 0 or register > 255:
+    if register < 0 or register > pow(255, byte_count):
         raise ValueError(f"Provided I²C device register {register} is out of range! (allowed range: 0 ≤ x ≤ 255)")
     max_value = pow(256, byte_count) - 1
     if value < 0 or value > max_value:
