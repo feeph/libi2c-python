@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.7.1](https://github.com/feeph/libi2c-python/compare/v0.7.0...v0.7.1) (2024-08-04)
+
+
+### Bug Fixes
+
+* use correct byte order for multi-byte read/write ([352d5e9](https://github.com/feeph/libi2c-python/commit/352d5e9cf24e646253ebb09db2b4e0e3a4c655a1))
+* use correct byte order for multi-byte read/write ([#38](https://github.com/feeph/libi2c-python/issues/38)) ([7ff10f6](https://github.com/feeph/libi2c-python/commit/7ff10f6b42737e656f97e48b2a75be66247aa61d))
+
 ## [0.7.0](https://github.com/feeph/libi2c-python/compare/v0.6.0...v0.7.0) (2024-07-29)
 
 
