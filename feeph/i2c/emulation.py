@@ -6,6 +6,7 @@ import random
 
 # module busio provide no type hints
 import busio  # type: ignore
+from feeph.i2c.conversions import convert_bytearry_to_uint, convert_uint_to_bytearry
 
 
 class EmulatedI2C(busio.I2C):
@@ -50,13 +51,16 @@ class EmulatedI2C(busio.I2C):
     def readfrom_into(self, address, buffer, *, start=0, end=None, stop=True):
         """
         read device state
+
+        (buffer is used as an output parameter)
         """
         i2c_device_address  = address
         i2c_device_register = -1
         value = self._state[i2c_device_address][i2c_device_register]
+        ba = convert_uint_to_bytearry(value, len(buffer))
+        # copy computed result to output parameter
         for i in range(len(buffer)):
-            buffer[i] = value & 0xff
-            value = value >> 8
+            buffer[i] = ba[i]
 
     def writeto(self, address: int, buffer: bytearray, *, start=0, end=None):
         """
@@ -73,26 +77,21 @@ class EmulatedI2C(busio.I2C):
             i2c_device_register = buffer[0]
             if i2c_device_register < 0:
                 raise ValueError("device register can't be negative")
-            value = 0
-            # i must count up (0->len-1) to calculate the correct bitshift
-            # offset must count down (len->1) when populating the buffer
-            #  0x..## -> buf[2]  -> i = 0, offset = 2
-            #  0x##.. -> buf[1]  -> i = 1, offset = 1
-            # (buf[0] contains the register address)
-            for i in range(len(buffer) - 1):
-                value += buffer[1 + i] << i*8
+            value = convert_bytearry_to_uint(buffer[1:])
         self._state[i2c_device_address][i2c_device_register] = value
 
     def writeto_then_readfrom(self, address: int, buffer_out: bytearray, buffer_in: bytearray, *, out_start=0, out_end=None, in_start=0, in_end=None, stop=False):
         """
         read device register
+
+        (buffer_in is used as an output parameter)
         """
         i2c_device_address  = address
         i2c_device_register = buffer_out[0]
         if i2c_device_register < 0:
             raise ValueError("device register can't be negative")
         value = self._state[i2c_device_address][i2c_device_register]
-        byte_count = len(buffer_in)
-        for i in range(byte_count):
-            buffer_in[byte_count - 1 - i] = value & 0xff
-            value = value >> 8
+        ba = convert_uint_to_bytearry(value, len(buffer_in))
+        # copy computed result to output parameter
+        for i in range(len(buffer_in)):
+            buffer_in[i] = ba[i]
