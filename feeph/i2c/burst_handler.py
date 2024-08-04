@@ -70,7 +70,7 @@ class BurstHandle:
                 self._i2c_bus.writeto_then_readfrom(address=self._i2c_adr, buffer_out=buf_r, buffer_in=buf_w)
                 value = 0
                 for i in range(byte_count):
-                    value += buf_w[i] << i*8
+                    value += buf_w[byte_count - 1 - i] << i*8
                 return value
             except OSError as e:
                 # [Errno 121] Remote I/O error
@@ -94,11 +94,8 @@ class BurstHandle:
             try:
                 buf = bytearray(1 + byte_count)  # buf[0], buf[1], buf[2]
                 buf[0] = register
-                # need to populate the bytes in reverse order:
-                #   0x##.. => buf[2]
-                #   0x..## => buf[1]
-                for i in range(byte_count, 0, -1):
-                    buf[i] = value & 0xFF
+                for i in range(byte_count):
+                    buf[1+i] = value & 0xFF
                     value = value >> 8
                 self._i2c_bus.writeto(address=self._i2c_adr, buffer=buf)
                 return
