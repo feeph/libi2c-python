@@ -24,6 +24,7 @@ import time
 
 # module busio provides no type hints
 import busio  # type: ignore
+from feeph.i2c.conversions import convert_bytearry_to_uint, convert_uint_to_bytearry
 
 LH = logging.getLogger("i2c")
 
@@ -61,17 +62,15 @@ class BurstHandle:
             the bus within allowed time
         - may raise a RuntimeError if there were too many errors
         """
-        _validate_inputs(register=register, value=0, byte_count=byte_count, max_tries=max_tries)
+        _validate_register_address(register)
+        buf_r = bytearray(byte_count)
+        buf_r[0] = register
+        buf_w = bytearray(byte_count)
         for cur_try in range(1, 1 + max_tries):
             try:
-                buf_r = bytearray(byte_count)
-                buf_r[0] = register
-                buf_w = bytearray(byte_count)
                 self._i2c_bus.writeto_then_readfrom(address=self._i2c_adr, buffer_out=buf_r, buffer_in=buf_w)
-                value = 0
-                for i in range(byte_count):
-                    value += buf_w[i] << i*8
-                return value
+                LH.warning("read_register(): %s", buf_w)
+                return convert_bytearry_to_uint(buf_w)
             except OSError as e:
                 # [Errno 121] Remote I/O error
                 LH.warning("[%s] Failed to read register 0x%02X (%i/%i): %s",  __name__, register, cur_try, max_tries, e)
@@ -85,21 +84,22 @@ class BurstHandle:
     def write_register(self, register: int, value: int, byte_count: int = 1, max_tries: int = 3):
         """
         write a single register to I²C device identified by `i2c_adr`
-        - may raise a RuntimeError if it was not possible to acquire
+          - may raise a ValueError if I²C address is out of range
+          - may raise a ValueError if the provided value is out of range
+          - may raise a RuntimeError if it was not possible to acquire
             the bus within allowed time
-        - may raise a RuntimeError if there were too many errors
+          - may raise a RuntimeError if there were too many errors
         """
-        _validate_inputs(register=register, value=value, byte_count=byte_count, max_tries=max_tries)
+        _validate_register_address(register)
+        ba = convert_uint_to_bytearry(value, byte_count)
+        LH.warning(" write_register(): ba  = %s", ba)
+        buf = bytearray(1 + len(ba))
+        buf[0] = register
+        for i in range(len(ba)):
+            buf[1+i] = ba[i]
+        LH.warning("write_register(): buf = %s", buf)
         for cur_try in range(1, 1 + max_tries):
             try:
-                buf = bytearray(1 + byte_count)  # buf[0], buf[1], buf[2]
-                buf[0] = register
-                # need to populate the bytes in reverse order:
-                #   0x##.. => buf[2]
-                #   0x..## => buf[1]
-                for i in range(byte_count, 0, -1):
-                    buf[i] = value & 0xFF
-                    value = value >> 8
                 self._i2c_bus.writeto(address=self._i2c_adr, buffer=buf)
                 return
             except OSError as e:
@@ -123,13 +123,12 @@ class BurstHandle:
             the bus within allowed time
         - may raise a RuntimeError if there were too many errors
         """
-        _validate_inputs(register=0, value=0, byte_count=byte_count, max_tries=max_tries)
         if byte_count > 1:
             LH.warning("Multi byte reads are not implemented yet! Returning a single byte instead.")
             byte_count = 1
+        buf = bytearray(byte_count)
         for cur_try in range(1, 1 + max_tries):
             try:
-                buf = bytearray(byte_count)
                 self._i2c_bus.readfrom_into(address=self._i2c_adr, buffer=buf)
                 return buf[0]
             except OSError as e:
@@ -149,14 +148,12 @@ class BurstHandle:
             the bus within allowed time
         - may raise a RuntimeError if there were too many errors
         """
-        _validate_inputs(register=0, value=value, byte_count=byte_count, max_tries=max_tries)
         if byte_count > 1:
             LH.warning("Multi byte writes are not implemented yet! Returning a single byte instead.")
             byte_count = 1
+        buf = convert_uint_to_bytearry(value, byte_count)
         for cur_try in range(1, 1 + max_tries):
             try:
-                buf = bytearray(byte_count)
-                buf[0] = value & 0xFF
                 self._i2c_bus.writeto(address=self._i2c_adr, buffer=buf)
                 return
             except OSError as e:
@@ -228,13 +225,9 @@ class BurstHandler:
         self._i2c_bus.unlock()
 
 
-def _validate_inputs(register: int, value: int, byte_count: int = 1, max_tries: int = 3):
-    if register < 0 or register > pow(255, byte_count):
+def _validate_register_address(register: int):
+    """
+    verify that the register address is within the allowed range
+    """
+    if register < 0 or register > 255:
         raise ValueError(f"Provided I²C device register {register} is out of range! (allowed range: 0 ≤ x ≤ 255)")
-    max_value = pow(256, byte_count) - 1
-    if value < 0 or value > max_value:
-        raise ValueError(f"Provided value {register} is out of range! (allowed range: 0 ≤ x ≤ {max_value})")
-    if byte_count < 1:
-        raise ValueError(f"byte count must be at least 1 (value: {byte_count})")
-    if max_tries < 0:
-        raise ValueError(f"Provided max tries value {max_tries} is out of range! (allowed range: 0 ≤ x)")
