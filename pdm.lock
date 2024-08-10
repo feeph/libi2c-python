@@ -89,12 +89,12 @@ files = [
 
 [[package]]
 name = "adafruit-platformdetect"
-version = "3.72.1"
+version = "3.73.0"
 summary = "Platform detection for use by libraries like Adafruit-Blinka."
 groups = ["default"]
 files = [
-    {file = "Adafruit_PlatformDetect-3.72.1-py3-none-any.whl", hash = "sha256:65a0aa5054a4a9a8f7e3d4eec9828815a4e1b02085b3c977975e41f697226fd5"},
-    {file = "adafruit_platformdetect-3.72.1.tar.gz", hash = "sha256:a360ccb5fddfe60ce52304bb2d5a5345993df03997e33b7fd2dc65e51c39f02c"},
+    {file = "Adafruit_PlatformDetect-3.73.0-py3-none-any.whl", hash = "sha256:5fc80192a154c29dc1e2819e9c435ea7f8af8fe01c328f35e4bfdabb9934a425"},
+    {file = "adafruit_platformdetect-3.73.0.tar.gz", hash = "sha256:2309098adc8ff87b3d9a4a5d3aeebe3f7b7f55ab0e13d19eb75ffa865f36fab8"},
 ]
 
 [[package]]
