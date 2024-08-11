@@ -69,7 +69,6 @@ class BurstHandle:
         for cur_try in range(1, 1 + max_tries):
             try:
                 self._i2c_bus.writeto_then_readfrom(address=self._i2c_adr, buffer_out=buf_r, buffer_in=buf_w)
-                LH.warning("read_register(): %s", buf_w)
                 return convert_bytearry_to_uint(buf_w)
             except OSError as e:
                 # [Errno 121] Remote I/O error
