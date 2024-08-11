@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.3](https://github.com/feeph/libi2c-python/compare/v0.7.2...v0.7.3) (2024-08-11)
+
+
+### Bug Fixes
+
+* remove warning messages that were used for debugging ([#48](https://github.com/feeph/libi2c-python/issues/48)) ([6327fd9](https://github.com/feeph/libi2c-python/commit/6327fd9a961e9444db628865e18e79082a367540))
+
 ## [0.7.2](https://github.com/feeph/libi2c-python/compare/v0.7.1...v0.7.2) (2024-08-11)
 
 
