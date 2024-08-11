@@ -92,12 +92,10 @@ class BurstHandle:
         """
         _validate_register_address(register)
         ba = convert_uint_to_bytearry(value, byte_count)
-        LH.warning(" write_register(): ba  = %s", ba)
         buf = bytearray(1 + len(ba))
         buf[0] = register
         for i in range(len(ba)):
             buf[1+i] = ba[i]
-        LH.warning("write_register(): buf = %s", buf)
         for cur_try in range(1, 1 + max_tries):
             try:
                 self._i2c_bus.writeto(address=self._i2c_adr, buffer=buf)
