@@ -19,8 +19,6 @@ with feeph.i2c.Burst(i2c_bus=i2c_bus, i2c_adr=0x70) as bh:
 ```
 """
 
-import logging
-
 
 def convert_uint_to_bytearry(value: int, byte_count: int) -> bytearray:
     """
@@ -34,7 +32,7 @@ def convert_uint_to_bytearry(value: int, byte_count: int) -> bytearray:
     ```
     """
     min_value = 0
-    max_value = pow(256, byte_count) - 1 
+    max_value = pow(256, byte_count) - 1
     if min_value <= value <= max_value:
         buf = bytearray(byte_count)
         for idx in range(byte_count):
