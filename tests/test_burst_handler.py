@@ -8,6 +8,7 @@ import unittest
 import feeph.i2c as sut  # sytem under test
 
 
+# pylint: disable=protected-access,too-many-public-methods
 class TestBurstHandler(unittest.TestCase):
 
     def test_read_device_register(self):
@@ -37,6 +38,15 @@ class TestBurstHandler(unittest.TestCase):
         expected = 0x1234
         # -----------------------------------------------------------------
         self.assertEqual(computed, expected)
+
+    def test_read_device_register_insufficient_tries(self):
+        i2c_bus = sut.EmulatedI2C(state={})
+        # -----------------------------------------------------------------
+        # -----------------------------------------------------------------
+        with sut.BurstHandler(i2c_bus=i2c_bus, i2c_adr=0x4C) as bh:
+            # under realistic circumstances the max_tries would be a positive
+            # value but we're intentionally setting it to 0 to force an error
+            self.assertRaises(RuntimeError, bh.read_register, 0x00, max_tries=0)
 
     def test_read_device_registers(self):
         state = {
@@ -103,6 +113,15 @@ class TestBurstHandler(unittest.TestCase):
         expected = {0x00: 0x1234}
         # -----------------------------------------------------------------
         self.assertEqual(computed, expected)
+
+    def test_write_device_register_insufficient_tries(self):
+        i2c_bus = sut.EmulatedI2C(state={})
+        # -----------------------------------------------------------------
+        # -----------------------------------------------------------------
+        with sut.BurstHandler(i2c_bus=i2c_bus, i2c_adr=0x4C) as bh:
+            # under realistic circumstances the max_tries would be a positive
+            # value but we're intentionally setting it to 0 to force an error
+            self.assertRaises(RuntimeError, bh.write_register, 0x00, value=0x12, max_tries=0)
 
     def test_write_device_registers(self):
         state = {
@@ -187,6 +206,15 @@ class TestBurstHandler(unittest.TestCase):
         # -----------------------------------------------------------------
         self.assertEqual(computed, expected)
 
+    def test_get_state_insufficient_tries(self):
+        i2c_bus = sut.EmulatedI2C(state={})
+        # -----------------------------------------------------------------
+        # -----------------------------------------------------------------
+        with sut.BurstHandler(i2c_bus=i2c_bus, i2c_adr=0x4C) as bh:
+            # under realistic circumstances the max_tries would be a positive
+            # value but we're intentionally setting it to 0 to force an error
+            self.assertRaises(RuntimeError, bh.get_state, max_tries=0)
+
     def test_set_state(self):
         state = {
             0x70: {-1: 0x00},
@@ -205,11 +233,49 @@ class TestBurstHandler(unittest.TestCase):
         # -----------------------------------------------------------------
         # -----------------------------------------------------------------
         with sut.BurstHandler(i2c_bus=i2c_bus, i2c_adr=0x70) as bh:
-            self.assertRaises(ValueError, bh.set_state, value=0x0102)
+            self.assertRaises(ValueError, bh.set_state, value=0x0102, byte_count=2)
+
+    def test_set_state_insufficient_tries(self):
+        i2c_bus = sut.EmulatedI2C(state={})
+        # -----------------------------------------------------------------
+        # -----------------------------------------------------------------
+        with sut.BurstHandler(i2c_bus=i2c_bus, i2c_adr=0x4C) as bh:
+            # under realistic circumstances the max_tries would be a positive
+            # value but we're intentionally setting it to 0 to force an error
+            self.assertRaises(RuntimeError, bh.set_state, value=0x12, max_tries=0)
 
     # ---------------------------------------------------------------------
 
-    def test_no_timeout(self):
+    def test_invalid_device_address(self):
+        # this code tests the equivalent of:
+        # with sut.BurstHandler(i2c_bus=i2c_bus, i2c_adr=0xFFFF) as bh:
+        #     ...
+        i2c_bus = sut.EmulatedI2C(state={})
+        bh = sut.BurstHandler(i2c_bus=i2c_bus, i2c_adr=0xFFFF)
+        # -----------------------------------------------------------------
+        # -----------------------------------------------------------------
+        self.assertRaises(ValueError, bh.__enter__)
+
+    def test_invalid_device_register(self):
+        # this code tests the equivalent of:
+        # with sut.BurstHandler(i2c_bus=i2c_bus, i2c_adr=0xFFFF) as bh:
+        #     ...
+        i2c_bus = sut.EmulatedI2C(state={})
+        # -----------------------------------------------------------------
+        # -----------------------------------------------------------------
+        with sut.BurstHandler(i2c_bus=i2c_bus, i2c_adr=0x70) as bh:
+            self.assertRaises(ValueError, bh.read_register, register=0xFFFF)
+
+    def test_invalid_timeout(self):
+        # this code tests the equivalent of:
+        # with sut.BurstHandler(i2c_bus=i2c_bus, i2c_adr=0x4C, timeout_ms=0) as bh:
+        #     ...
+        i2c_bus = sut.EmulatedI2C(state={}, lock_chance=1)
+        # -----------------------------------------------------------------
+        # -----------------------------------------------------------------
+        self.assertRaises(ValueError, sut.BurstHandler, i2c_bus=i2c_bus, i2c_adr=0x4C, timeout_ms=0)
+
+    def test_hard_to_lock(self):
         state = {
             0x4C: {
                 0x00: 0x12,
@@ -224,3 +290,13 @@ class TestBurstHandler(unittest.TestCase):
         expected = 0x12
         # -----------------------------------------------------------------
         self.assertEqual(computed, expected)
+
+    def test_unable_to_lock(self):
+        # this code tests the equivalent of:
+        # with sut.BurstHandler(i2c_bus=i2c_bus, i2c_adr=0x4C) as bh:
+        #     ...
+        i2c_bus = sut.EmulatedI2C(state={}, lock_chance=0)  # impossible to acquire a lock
+        bh = sut.BurstHandler(i2c_bus=i2c_bus, i2c_adr=0x4C)
+        # -----------------------------------------------------------------
+        # -----------------------------------------------------------------
+        self.assertRaises(RuntimeError, bh.__enter__)

@@ -66,19 +66,18 @@ class BurstHandle:
         buf_r = bytearray(byte_count)
         buf_r[0] = register
         buf_w = bytearray(byte_count)
+        cur_try = 0
         for cur_try in range(1, 1 + max_tries):
             try:
                 self._i2c_bus.writeto_then_readfrom(address=self._i2c_adr, buffer_out=buf_r, buffer_in=buf_w)
                 return convert_bytearry_to_uint(buf_w)
-            except OSError as e:
+            # protect against sporadic errors on actual devices
+            # (maybe we can do something to prevent these errors?)
+            except (OSError, RuntimeError) as e:
                 # [Errno 121] Remote I/O error
-                LH.warning("[%s] Failed to read register 0x%02X (%i/%i): %s",  __name__, register, cur_try, max_tries, e)
-                time.sleep(0.001)
-            except RuntimeError as e:
                 LH.warning("[%s] Unable to read register 0x%02X (%i/%i): %s", __name__, register, cur_try, max_tries, e)
                 time.sleep(0.001)
-        else:
-            raise RuntimeError(f"Unable to read register 0x{register:02X} after {cur_try} attempts. Giving up.")
+        raise RuntimeError(f"Unable to read register 0x{register:02X} after {cur_try} attempts. Giving up.")
 
     def write_register(self, register: int, value: int, byte_count: int = 1, max_tries: int = 3):
         """
@@ -91,23 +90,21 @@ class BurstHandle:
         """
         _validate_register_address(register)
         ba = convert_uint_to_bytearry(value, byte_count)
-        buf = bytearray(1 + len(ba))
-        buf[0] = register
-        for i in range(len(ba)):
-            buf[1+i] = ba[i]
+        buf = bytearray([register])
+        for byte in ba:
+            buf.append(byte)
+        cur_try = 0
         for cur_try in range(1, 1 + max_tries):
             try:
                 self._i2c_bus.writeto(address=self._i2c_adr, buffer=buf)
                 return
-            except OSError as e:
+            # protect against sporadic errors on actual devices
+            # (maybe we can do something to prevent these errors?)
+            except (OSError, RuntimeError) as e:
                 # [Errno 121] Remote I/O error
-                LH.warning("[%s] Failed to read register 0x%02X (%i/%i): %s",  __name__, register, cur_try, max_tries, e)
+                LH.warning("[%s] Unable to write register 0x%02X (%i/%i): %s", __name__, register, cur_try, max_tries, e)
                 time.sleep(0.1)
-            except RuntimeError as e:
-                LH.warning("[%s] Unable to read register 0x%02X (%i/%i): %s", __name__, register, cur_try, max_tries, e)
-                time.sleep(0.1)
-        else:
-            raise RuntimeError(f"Unable to read register 0x{register:02X} after {cur_try} attempts. Giving up.")
+        raise RuntimeError(f"Unable to read register 0x{register:02X} after {cur_try} attempts. Giving up.")
 
     # it is unclear if it's possible to have a multi-byte state registers
     # (a register write looks exactly like a multi-byte state write)
@@ -124,19 +121,18 @@ class BurstHandle:
             LH.warning("Multi byte reads are not implemented yet! Returning a single byte instead.")
             byte_count = 1
         buf = bytearray(byte_count)
+        cur_try = 0
         for cur_try in range(1, 1 + max_tries):
             try:
                 self._i2c_bus.readfrom_into(address=self._i2c_adr, buffer=buf)
                 return buf[0]
-            except OSError as e:
+            # protect against sporadic errors on actual devices
+            # (maybe we can do something to prevent these errors?)
+            except (OSError, RuntimeError) as e:
                 # [Errno 121] Remote I/O error
-                LH.warning("[%s] Failed to read state (%i/%i): %s",  __name__, cur_try, max_tries, e)
-                time.sleep(0.001)
-            except RuntimeError as e:
                 LH.warning("[%s] Unable to read state (%i/%i): %s", __name__, cur_try, max_tries, e)
                 time.sleep(0.001)
-        else:
-            raise RuntimeError(f"Unable to read state after {cur_try} attempts. Giving up.")
+        raise RuntimeError(f"Unable to read state after {cur_try} attempts. Giving up.")
 
     def set_state(self, value: int, byte_count: int = 1, max_tries: int = 3):
         """
@@ -149,19 +145,18 @@ class BurstHandle:
             LH.warning("Multi byte writes are not implemented yet! Returning a single byte instead.")
             byte_count = 1
         buf = convert_uint_to_bytearry(value, byte_count)
+        cur_try = 0
         for cur_try in range(1, 1 + max_tries):
             try:
                 self._i2c_bus.writeto(address=self._i2c_adr, buffer=buf)
                 return
-            except OSError as e:
+            # protect against sporadic errors on actual devices
+            # (maybe we can do something to prevent these errors?)
+            except (OSError, RuntimeError) as e:
                 # [Errno 121] Remote I/O error
-                LH.warning("[%s] Failed to write state (%i/%i): %s",  __name__, cur_try, max_tries, e)
+                LH.warning("[%s] Unable to write state (%i/%i): %s", __name__, cur_try, max_tries, e)
                 time.sleep(0.1)
-            except RuntimeError as e:
-                LH.warning("[%s] Unable to write state 0x%02X (%i/%i): %s", __name__, cur_try, max_tries, e)
-                time.sleep(0.1)
-        else:
-            raise RuntimeError(f"Unable to write state after {cur_try} attempts. Giving up.")
+        raise RuntimeError(f"Unable to write state after {cur_try} attempts. Giving up.")
 
 
 class BurstHandler:
@@ -182,6 +177,8 @@ class BurstHandler:
             self._timeout_ms = timeout_ms
         else:
             raise ValueError("Provided timeout is not a positive integer or 'None'!")
+        # register '_timestart_ns' - we will populate it later on
+        self._timestart_ns = 0
 
     def __enter__(self) -> BurstHandle:
         """

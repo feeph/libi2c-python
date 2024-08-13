@@ -37,17 +37,33 @@ done
 pdm install
 ```
 
-### perform unit tests:
+### testing
+
+The entire test suite (unit tests & compatibility tests) can be triggered
+by running
 
 ```SHELL
-pdm run pytest
+scripts/run_tests
 ```
 
-### perform compatibility tests:
+You have successfully run all tests when the output ends with:
 
-```SHELL
-tox
 ```
+----------------------------------------------------------------------
+If you reached this far you passed. Congratulations!
+----------------------------------------------------------------------
+```
+
+If the unit tests have run successfully coverage file in LCOV format is
+generated and stored at `coverage/lcov.info`. This file can be used by
+your IDE to indicate code coverage from within your editor window.
+- We recommend the Visual Studio Code extension
+  [Code Coverage](https://marketplace.visualstudio.com/items?itemName=markis.code-coverage).
+- Special care should be taken when modifying code that is not covered by unit tests!
+
+Branches that do not pass the test harness (e.g. due to failing unit tests
+or lowering the code coverage beneath the desired threshold) should not be
+pull-requested.
 
 ### use the demo script
 
