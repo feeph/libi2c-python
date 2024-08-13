@@ -72,9 +72,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          pdm run pytest --cov=feeph.i2c --cov-report=term-missing --no-header --quiet tests/
-          #pdm run coverage run --source=feeph.i2c -m pytest tests/
+          pdm run coverage run --source=feeph.i2c -m pytest tests/
           pdm run coveralls
+          mkdir -p coverage
+          pdm run coverage-lcov --output_file_path=coverage/lcov.info
       - name: coveralls action
         uses: coverallsapp/github-action@v2
   test:
