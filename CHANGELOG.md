@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.7.4](https://github.com/feeph/libi2c-python/compare/v0.7.3...v0.7.4) (2024-08-13)
+
+
+### Bug Fixes
+
+* improve code quality and testing procedure ([#57](https://github.com/feeph/libi2c-python/issues/57)) ([eb578e1](https://github.com/feeph/libi2c-python/commit/eb578e1865690a85fc79c5db650773216fb389fd))
+* resolve issues identified by pylint ([af706d0](https://github.com/feeph/libi2c-python/commit/af706d0bfc10275c35ab4d6331356f4153749a2a))
+
 ## [0.7.3](https://github.com/feeph/libi2c-python/compare/v0.7.2...v0.7.3) (2024-08-11)
 
 
