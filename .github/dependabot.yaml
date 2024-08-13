@@ -1,7 +1,7 @@
 ---
 # enable dependabot's scanning but do not allow creation of pull requests
 # (please use 'scripts/update_dependencies' to update the dependencies)
-# 
+#
 # - dependabot does not understand PEP-621 repositories (pyproject.toml)
 # - dependabot expects the filename to end in '<...>requirements.txt' and
 #   ignores requirements-dev.txt ('dev-requirements.txt' would work but
