@@ -72,7 +72,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          pdm run coverage run --source=feeph.i2c -m pytest tests/
+          pdm run pytest --cov=feeph.i2c --cov-report=term-missing --no-header --quiet tests/
+          #pdm run coverage run --source=feeph.i2c -m pytest tests/
           pdm run coveralls
       - name: coveralls action
         uses: coverallsapp/github-action@v2
