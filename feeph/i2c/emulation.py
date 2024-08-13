@@ -21,6 +21,11 @@ class EmulatedI2C(busio.I2C):
     (e.g. duplicated registers with multiple addresses)
     """
 
+    # We intentionally do not call super().init() because we don't want to
+    # call any of the hardware initialization code. We are only interested
+    # in being able to claim we are an instance of 'busio.I2C' in case
+    # something else tries to validate that or has logic tied to it.
+    # pylint: disable=super-init-not-called
     def __init__(self, state: dict[int, dict[int, int]], lock_chance: int = 100):
         """
         initialize a simulated I2C bus
@@ -39,7 +44,7 @@ class EmulatedI2C(busio.I2C):
 
     def try_lock(self) -> bool:
         # may randomly fail to acquire a lock
-        return (random.randint(0, 100) < self._lock_chance)
+        return random.randint(0, 100) < self._lock_chance
 
     def unlock(self):
         pass
@@ -48,6 +53,8 @@ class EmulatedI2C(busio.I2C):
     # being read/written since the register address must be positive in the
     # range 0 ≤ x ≤ 255.
 
+    # replicate the signature of busio.I2C
+    # pylint: disable=too-many-arguments
     def readfrom_into(self, address, buffer, *, start=0, end=None, stop=True):
         """
         read device state
@@ -59,9 +66,12 @@ class EmulatedI2C(busio.I2C):
         value = self._state[i2c_device_address][i2c_device_register]
         ba = convert_uint_to_bytearry(value, len(buffer))
         # copy computed result to output parameter
+        # pylint: disable=consider-using-enumerate
         for i in range(len(buffer)):
             buffer[i] = ba[i]
 
+    # replicate the signature of busio.I2C
+    # pylint: disable=too-many-arguments
     def writeto(self, address: int, buffer: bytearray, *, start=0, end=None):
         """
         write device state or register
@@ -93,5 +103,6 @@ class EmulatedI2C(busio.I2C):
         value = self._state[i2c_device_address][i2c_device_register]
         ba = convert_uint_to_bytearry(value, len(buffer_in))
         # copy computed result to output parameter
+        # pylint: disable=consider-using-enumerate
         for i in range(len(buffer_in)):
             buffer_in[i] = ba[i]

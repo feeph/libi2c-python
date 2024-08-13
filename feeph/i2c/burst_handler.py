@@ -77,8 +77,7 @@ class BurstHandle:
             except RuntimeError as e:
                 LH.warning("[%s] Unable to read register 0x%02X (%i/%i): %s", __name__, register, cur_try, max_tries, e)
                 time.sleep(0.001)
-        else:
-            raise RuntimeError(f"Unable to read register 0x{register:02X} after {cur_try} attempts. Giving up.")
+        raise RuntimeError(f"Unable to read register 0x{register:02X} after {cur_try} attempts. Giving up.")
 
     def write_register(self, register: int, value: int, byte_count: int = 1, max_tries: int = 3):
         """
@@ -91,10 +90,9 @@ class BurstHandle:
         """
         _validate_register_address(register)
         ba = convert_uint_to_bytearry(value, byte_count)
-        buf = bytearray(1 + len(ba))
-        buf[0] = register
-        for i in range(len(ba)):
-            buf[1+i] = ba[i]
+        buf = bytearray([register])
+        for byte in ba:
+            buf.append(byte)
         for cur_try in range(1, 1 + max_tries):
             try:
                 self._i2c_bus.writeto(address=self._i2c_adr, buffer=buf)
@@ -106,8 +104,7 @@ class BurstHandle:
             except RuntimeError as e:
                 LH.warning("[%s] Unable to read register 0x%02X (%i/%i): %s", __name__, register, cur_try, max_tries, e)
                 time.sleep(0.1)
-        else:
-            raise RuntimeError(f"Unable to read register 0x{register:02X} after {cur_try} attempts. Giving up.")
+        raise RuntimeError(f"Unable to read register 0x{register:02X} after {cur_try} attempts. Giving up.")
 
     # it is unclear if it's possible to have a multi-byte state registers
     # (a register write looks exactly like a multi-byte state write)
@@ -135,8 +132,7 @@ class BurstHandle:
             except RuntimeError as e:
                 LH.warning("[%s] Unable to read state (%i/%i): %s", __name__, cur_try, max_tries, e)
                 time.sleep(0.001)
-        else:
-            raise RuntimeError(f"Unable to read state after {cur_try} attempts. Giving up.")
+        raise RuntimeError(f"Unable to read state after {cur_try} attempts. Giving up.")
 
     def set_state(self, value: int, byte_count: int = 1, max_tries: int = 3):
         """
@@ -158,10 +154,9 @@ class BurstHandle:
                 LH.warning("[%s] Failed to write state (%i/%i): %s",  __name__, cur_try, max_tries, e)
                 time.sleep(0.1)
             except RuntimeError as e:
-                LH.warning("[%s] Unable to write state 0x%02X (%i/%i): %s", __name__, cur_try, max_tries, e)
+                LH.warning("[%s] Unable to write state (%i/%i): %s", __name__, cur_try, max_tries, e)
                 time.sleep(0.1)
-        else:
-            raise RuntimeError(f"Unable to write state after {cur_try} attempts. Giving up.")
+        raise RuntimeError(f"Unable to write state after {cur_try} attempts. Giving up.")
 
 
 class BurstHandler:
@@ -182,6 +177,8 @@ class BurstHandler:
             self._timeout_ms = timeout_ms
         else:
             raise ValueError("Provided timeout is not a positive integer or 'None'!")
+        # register '_timestart_ns' - we will populate it later on
+        self._timestart_ns = 0
 
     def __enter__(self) -> BurstHandle:
         """

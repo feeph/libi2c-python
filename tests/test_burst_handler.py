@@ -8,6 +8,7 @@ import unittest
 import feeph.i2c as sut  # sytem under test
 
 
+# pylint: disable=protected-access
 class TestBurstHandler(unittest.TestCase):
 
     def test_read_device_register(self):
