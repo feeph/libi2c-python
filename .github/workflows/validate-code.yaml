@@ -70,8 +70,8 @@ jobs:
           fi
       - name: generate coverage report
         run: |
-          coverage run --source=feeph.i2c -m pytest tests/
-          coveralls
+          pdm run coverage run --source=feeph.i2c -m pytest tests/
+          pdm run coveralls
       - name: coveralls action
         uses: coverallsapp/github-action@v2
   test:
