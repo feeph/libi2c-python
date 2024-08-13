@@ -68,16 +68,6 @@ jobs:
           if [[ -n $CONTRIB_FILES ]] ; then
             pdm run mypy $CONTRIB_FILES
           fi
-      - name: generate coverage report
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          pdm run coverage run --source=feeph.i2c -m pytest tests/
-          pdm run coveralls
-          mkdir -p coverage
-          pdm run coverage-lcov --output_file_path=coverage/lcov.info
-      - name: coveralls action
-        uses: coverallsapp/github-action@v2
   test:
     name: perform unit tests
     # wait on linting results; makes no sense to test if the code is broken
