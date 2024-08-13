@@ -55,12 +55,18 @@ class EmulatedI2C(busio.I2C):
 
     # replicate the signature of busio.I2C
     # pylint: disable=too-many-arguments
-    def readfrom_into(self, address, buffer, *, start=0, end=None, stop=True):
+    def readfrom_into(self, address: int, buffer: bytearray, *, start=0, end=None, stop=True):
         """
         read device state
 
         (buffer is used as an output parameter)
         """
+        # make sure that buffer truly is a bytearray
+        # (we really want this to be a bytearray because bytearray performs
+        # its own input validation and automatically guarantees we're not
+        # getting negative byte values or other unexpected data as input)
+        if not isinstance(buffer, bytearray):
+            raise ValueError("buffer must be of type 'bytearray'")
         i2c_device_address  = address
         i2c_device_register = -1
         value = self._state[i2c_device_address][i2c_device_register]
@@ -76,6 +82,12 @@ class EmulatedI2C(busio.I2C):
         """
         write device state or register
         """
+        # make sure that buffer truly is a bytearray
+        # (we really want this to be a bytearray because bytearray performs
+        # its own input validation and automatically guarantees we're not
+        # getting negative byte values or other unexpected data as input)
+        if not isinstance(buffer, bytearray):
+            raise ValueError("buffer must be of type 'bytearray'")
         if len(buffer) == 1:
             # device status
             i2c_device_address  = address
@@ -85,8 +97,6 @@ class EmulatedI2C(busio.I2C):
             # device register
             i2c_device_address  = address
             i2c_device_register = buffer[0]
-            if i2c_device_register < 0:
-                raise ValueError("device register can't be negative")
             value = convert_bytearry_to_uint(buffer[1:])
         self._state[i2c_device_address][i2c_device_register] = value
 
@@ -96,10 +106,16 @@ class EmulatedI2C(busio.I2C):
 
         (buffer_in is used as an output parameter)
         """
+        # make sure that buffer_in and buffer_out truly are a bytearray
+        # (we really want this to be a bytearray because bytearray performs
+        # its own input validation and automatically guarantees we're not
+        # getting negative byte values or other unexpected data as input)
+        if not isinstance(buffer_in, bytearray):
+            raise ValueError("buffer_in must be of type 'bytearray'")
+        if not isinstance(buffer_out, bytearray):
+            raise ValueError("buffer_out must be of type 'bytearray'")
         i2c_device_address  = address
         i2c_device_register = buffer_out[0]
-        if i2c_device_register < 0:
-            raise ValueError("device register can't be negative")
         value = self._state[i2c_device_address][i2c_device_register]
         ba = convert_uint_to_bytearry(value, len(buffer_in))
         # copy computed result to output parameter
