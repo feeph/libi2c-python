@@ -35,7 +35,7 @@ if command -v gh >/dev/null ; then
     #  - --jq='.[] | select(.name=="...")' does not indicate if there was no
     #    result ('...|jq -e' would, but that would require jq to be installed)
     if ! gh label list --search="dep" --json='name' --jq='.[]["name"]'|grep -q "^dependencies$" ; then
-        gh label create dependencies --color="#0366d6"
+        gh label create dependencies --color="#0366d6" --description="update dependency files (pdm.lock & requirements*.txt)"
     fi
     gh pr create --assignee="@me" --base=master --head=$branch_name --fill --label="dependencies"
 else
