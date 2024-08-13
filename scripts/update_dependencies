@@ -26,5 +26,10 @@ if git stash show ; then
     git stash pop
 fi
 
-# use github tools to create a pull request
-gh pr create --assignee="@me" --base=master --head=$branch_name --fill --label="dependencies"
+# if present: use GitHub CLI tools to create a pull request
+if command -v gh ; then
+    gh pr create --assignee="@me" --base=master --head=$branch_name --fill --label="dependencies"
+else
+    echo "GitHub CLI tools not found. Unable to create a pull request."
+    echo "-> https://github.com/cli/cli"
+fi
