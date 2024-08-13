@@ -1,0 +1,30 @@
+#!/bin/bash
+#
+# update Python dependencies using PDM
+# (requires `gh auth login`)
+#
+
+set -e
+set -u
+
+branch_name="fb-update-dependencies_`date +'%s'`"
+
+git stash save
+current_branch=`git branch --show-current`
+git checkout master
+git pull
+git checkout -b $branch_name
+pdm update --update-all
+git add --update
+git commit -m "chore: update dependencies (pdm update --update-all)"
+git push --set-upstream origin $branch_name
+git checkout $current_branch
+
+# restore original state
+git checkout $current_branch
+if git stash show ; then
+    git stash pop
+fi
+
+# use github tools to create a pull request
+gh pr create --assignee="@me" --base=master --head=$branch_name --fill --label="dependencies"
