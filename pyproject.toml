@@ -19,7 +19,7 @@
 
 [project]
 name = "feeph.i2c"
-version = "0.7.3"
+version = "0.7.4"
 description = "abstraction layer for the I²C bus (incl. simulation for testing)"
 authors = [
     {name = "Feeph Aifeimei", email = "55798703+feeph@users.noreply.github.com"},
