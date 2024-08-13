@@ -27,7 +27,7 @@ if git stash show ; then
 fi
 
 # if present: use GitHub CLI tools to create a pull request
-if command -v gh ; then
+if command -v gh >/dev/null ; then
     # I'm sorry but this is the best I could come up with to test if there
     # is a label "dependencies".
     #  - 'gh label list' limits its output to 30 tags
