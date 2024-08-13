@@ -74,6 +74,8 @@ jobs:
           pdm run coveralls
       - name: coveralls action
         uses: coverallsapp/github-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   test:
     name: perform unit tests
     # wait on linting results; makes no sense to test if the code is broken
