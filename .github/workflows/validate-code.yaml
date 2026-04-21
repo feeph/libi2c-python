@@ -87,7 +87,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
         run: |
-          uv export --format=requirements.txt --all-extras --dev --group=dev > requirements.txt
+          uv export --format=requirements.txt --all-extras --dev > requirements.txt
           pip install -r requirements.txt
       # https://github.com/marketplace/actions/run-pytest
       - name: perform unit tests (Python ${{ matrix.python-version }})
