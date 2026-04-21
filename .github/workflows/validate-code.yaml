@@ -83,6 +83,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: install uv
         uses: astral-sh/setup-uv@v7
+        with:
+          python-version: ${{ matrix.python-version }}
       - name: install dependencies
         env:
           UV_SYSTEM_PYTHON: 1
