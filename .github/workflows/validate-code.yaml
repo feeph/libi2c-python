@@ -77,10 +77,17 @@ jobs:
     steps:
       - name: checkout repository
         uses: actions/checkout@v6
-      - name: install uv (${{ matrix.python-version }})
-        uses: astral-sh/setup-uv@v7
+      - name: configure Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+      - name: install uv
+        uses: astral-sh/setup-uv@v7
+      - name: install dependencies
+        env:
+          UV_SYSTEM_PYTHON: 1
+        run: |
+          uv sync --locked --all-extras --dev
       # https://github.com/marketplace/actions/run-pytest
       - name: perform unit tests (Python ${{ matrix.python-version }})
         env:
@@ -88,6 +95,5 @@ jobs:
         uses: pavelzw/pytest-action@v2
         with:
           custom-arguments: '-q'
-          custom-pytest: 'uv run pytest'
           emoji: false
           report-title: 'Test Report (Python ${{ matrix.python-version }})'
