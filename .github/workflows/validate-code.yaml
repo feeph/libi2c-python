@@ -88,5 +88,6 @@ jobs:
         uses: pavelzw/pytest-action@v2
         with:
           custom-arguments: '-q'
+          custom-pytest: 'uv run pytest'
           emoji: false
           report-title: 'Test Report (Python ${{ matrix.python-version }})'
