@@ -80,7 +80,7 @@ jobs:
       - name: install uv (${{ matrix.python-version }})
         uses: astral-sh/setup-uv@v7
         with:
-          version: ${{ matrix.python-version }}
+          python-version: ${{ matrix.python-version }}
       # https://github.com/marketplace/actions/run-pytest
       - name: perform unit tests (Python ${{ matrix.python-version }})
         env:
