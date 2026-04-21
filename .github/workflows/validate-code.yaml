@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: identify changed files
         uses: tj-actions/changed-files@v46
         id: changed-files
@@ -41,13 +41,8 @@ jobs:
             contrib:
               - examples/**.py
               - test/**.py
-      - name: configure Python (using PDM)
-        uses: pdm-project/setup-pdm@v4
-        with:
-          python-version-file: pyproject.toml
-      - name: install dependencies
-        run: |
-          pdm install
+      - name: install uv
+        uses: astral-sh/setup-uv@v7
       - name: lint code (flake8)
         env:
           LIBRARY_FILES: ${{ steps.changed-files.outputs.library_all_changed_files }}
@@ -55,7 +50,7 @@ jobs:
         run: |
           if [[ -n $LIBRARY_FILES ]] || [[ -n $CONTRIB_FILES ]]  ; then
             # the GitHub editor is 127 chars wide
-            pdm run flake8 --max-line-length=127 --show-source --statistics $LIBRARY_FILES $CONTRIB_FILES
+            uv run flake8 --max-line-length=127 --show-source --statistics $LIBRARY_FILES $CONTRIB_FILES
           fi
       - name: lint code (mypy)
         env:
@@ -63,10 +58,10 @@ jobs:
         run: |
           # since this is a namespace package we must instruct mypy to scan
           # the code as a namespace package; it won't work if we scan files
-          pdm run mypy -p feeph.i2c
+          uv run mypy -p feeph.i2c
           # example scripts and tests can be scanned as files
           if [[ -n $CONTRIB_FILES ]] ; then
-            pdm run mypy $CONTRIB_FILES
+            uv run mypy $CONTRIB_FILES
           fi
   test:
     name: perform unit tests
@@ -81,15 +76,11 @@ jobs:
           - "3.12"
     steps:
       - name: checkout repository
-        uses: actions/checkout@v4
-      - name: configure Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/checkout@v6
+      - name: install uv (${{ matrix.python-version }})
+        uses: astral-sh/setup-uv@v7
         with:
-          python-version: ${{ matrix.python-version }}
-      - name: install dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install pytest pytest-md pytest-emoji
+          version: ${{ matrix.python-version }}
       # https://github.com/marketplace/actions/run-pytest
       - name: perform unit tests (Python ${{ matrix.python-version }})
         env:
