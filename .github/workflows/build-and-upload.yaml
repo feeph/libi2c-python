@@ -1,29 +1,36 @@
 ---
-name: publish on TestPyPI
+#
+# documentation:
+#  - https://docs.pypi.org/trusted-publishers/
+#  - https://github.com/astral-sh/trusted-publishing-examples/blob/main/.github/workflows/release.yml
+#
+name: publish package on TestPyPI
 
 on:
-  release:
-    types: [published]
-  workflow_dispatch:
+  push:
+    tags:
+      - v*
 
 jobs:
   build-and-upload:
     name: build package and upload to PyPI
     runs-on: ubuntu-latest
-    environment: publish-to-pypi-test
+    environment:
+      name: publish-to-pypi-test
     permissions:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: pdm-project/setup-pdm@v4
-      - name: Publish package distributions to PyPI
-        run: pdm publish --repository testpypi
-      # publish to PyPI (generic)
-      # - name: Publish package distributions to PyPI
-      #   uses: pypa/gh-action-pypi-publish@release/v1
-      # publish to Test-PyPI (generic)
-      # - name: Publish package distributions to TestPyPI
-      #   uses: pypa/gh-action-pypi-publish@release/v1
-      #   with:
-      #     repository-url: https://test.pypi.org/legacy/
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+      - name: Build package
+        run: uv build
+      # Check that basic features work and we didn't miss to include crucial files
+      # - name: Smoke test (wheel)
+      #   run: uv run --isolated --no-project --with dist/*.whl tests/smoke_test.py
+      # - name: Smoke test (source distribution)
+      #   run: uv run --isolated --no-project --with dist/*.tar.gz tests/smoke_test.py
+      - name: Publish package
+        run: uv publish
